@@ -1,28 +1,36 @@
-{
-  "name": "telegram-ai-bot",
-  "version": "1.0.0",
-  "description": "Telegram AI Bot using Gemini",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js"
-  },
-  "dependencies": {
-    "@google/genai": "^1.13.0",
-    "dotenv": "^16.4.7",
-    "node-telegram-bot-api": "^0.66.0"
-  }
-      }bot.onText(/\/start/, (msg) => {
+require("dotenv").config();
+
+const TelegramBot = require("node-telegram-bot-api");
+const { GoogleGenAI } = require("@google/genai");
+
+const bot = new TelegramBot(process.env.BOT_TOKEN, {
+  polling: true,
+});
+
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
+
+const memory = {};
+
+console.log("🤖 Rahul AI Started");
+bot.onText(/\/start/, (msg) => {
+
   bot.sendMessage(
     msg.chat.id,
-    `👋 Hello ${msg.from.first_name}!
 
-मैं आपका AI Assistant हूँ।
+`👋 Hello ${msg.from.first_name}
+
+मैं Rahul AI हूँ।
 
 आप मुझसे किसी भी विषय पर बात कर सकते हैं।
 
-बस मैसेज भेजिए। 😊`
+😊`
+
   );
-});bot.on("message", async (msg) => {
+
+});
+bot.on("message", async (msg) => {
 
   if (!msg.text) return;
 
@@ -39,27 +47,33 @@
     text: msg.text,
   });
 
-  try {    const history = memory[chatId]
+  try {
+
+    const history = memory[chatId]
       .map((m) => `${m.role}: ${m.text}`)
       .join("\n");
+        const response = await ai.models.generateContent({
 
-    const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
+
       contents: `
 You are Rahul AI.
 
-Behave like a friendly human friend.
+You are a friendly AI assistant.
+
+Always answer in the user's language.
 
 Previous Conversation:
 ${history}
 
-User: ${msg.text}
-`,
+User:
+${msg.text}
+`
+
     });
 
     const reply = response.text;
-
-    memory[chatId].push({
+        memory[chatId].push({
       role: "assistant",
       text: reply,
     });
