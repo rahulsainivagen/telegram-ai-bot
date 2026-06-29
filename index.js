@@ -12,7 +12,13 @@ const ai = new GoogleGenAI({
 });
 
 const memory = {};
-
+function getCurrentDateTime() {
+  return new Date().toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    dateStyle: "full",
+    timeStyle: "long",
+  });
+}
 console.log("🤖 Rahul AI Started");
 bot.onText(/\/start/, (msg) => {
 
