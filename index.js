@@ -12,6 +12,7 @@ const ai = new GoogleGenAI({
 });
 
 const memory = {};
+
 function getCurrentDateTime() {
   return new Date().toLocaleString("en-IN", {
     timeZone: "Asia/Kolkata",
@@ -19,6 +20,11 @@ function getCurrentDateTime() {
     timeStyle: "long",
   });
 }
+const history = memory[chatId]
+  .map((m) => `${m.role}: ${m.text}`)
+  .join("\n");
+
+const currentDateTime = getCurrentDateTime();
 console.log("🤖 Rahul AI Started");
 bot.onText(/\/start/, (msg) => {
 
